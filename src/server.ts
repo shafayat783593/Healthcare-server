@@ -1,5 +1,6 @@
 import app from "./app";
 import config from "./app/config";
+import { deleteUnVerifiedDoctor } from "./app/lib/cron";
 import { transporter } from "./app/lib/nodmailer";
 import { prisma } from "./app/lib/prisma";
 import { redisClient } from "./app/lib/redis";
@@ -12,11 +13,13 @@ const main = async () => {
 		console.log("Connected to the database successfully.");
 		await redisClient.connect();
 		console.log("Redis Connected Successfully")
+		 
 		await transporter.verify();
 		console.log("Notemailer Connected successfully")
 		await seedSuperAdmin()
 		await seedTesterDoctor()
 		await seedTesterAdmin()
+		await deleteUnVerifiedDoctor()
 		app.listen(PORT, () => {
 			console.log(`Server is running on port ${PORT}`);
 		});
