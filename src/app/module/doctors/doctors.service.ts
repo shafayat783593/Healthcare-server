@@ -193,9 +193,6 @@ const approveDoctor = async (payload: IApprovedDoctorPayload, reviewer:RequestUs
         }
     })
 
-    
-
-
 
 };
 
