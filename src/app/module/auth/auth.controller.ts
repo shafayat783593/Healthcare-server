@@ -4,12 +4,30 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import type { IRequestUser } from "./auth.interface";
 import { AuthService } from "./auth.service";
+import z from "zod";
+import { Patinvalidation } from "./auth.validation";
+
+
+
+
 
 const registerPatient = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
-	const result = await AuthService.registerPatient(payload);
+	
+	await AuthService.registerPatient(payload);
 
-	const { accessToken, refreshToken, user, patient } = result;
+	sendResponse(res, {
+		statusCode: httpStatus.CREATED,
+		success: true,
+		message: "Verification OTP Sent",
+		data: null
+	});
+});
+const verifyPatientEmail = catchAsync(async (req: Request, res: Response) => {
+	const payload = req.body;
+	
+	const result = await AuthService.verifyPatientEmail(payload)
+	const { accessToken, refreshToken } = result;
 
 	res.cookie("accessToken", accessToken, {
 		httpOnly: true,
@@ -25,17 +43,17 @@ const registerPatient = catchAsync(async (req: Request, res: Response) => {
 	});
 
 	sendResponse(res, {
-		statusCode: httpStatus.CREATED,
+		statusCode: httpStatus.OK,
 		success: true,
-		message: "Patient registered successfully",
+		message: "Email verify successfully",
 		data: {
 			accessToken,
 			refreshToken,
-			user,
-			patient,
 		},
 	});
 });
+
+
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
@@ -58,7 +76,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
 		success: true,
-		message: "User logged in successfully",
+		message: "Verify email  successfully",
 		data: {
 			accessToken,
 			refreshToken,
@@ -143,10 +161,37 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const forgotPassword = catchAsync(async(req:Request,res:Response)=>{
+	const paload = req.body
+	 await AuthService.forgotPassword(paload)
+		sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message:`OTP Sent To Email : ${paload.email}`,
+		data:null
+	});
+})
+
+
+const resetPassword = catchAsync(async(req:Request,res:Response)=>{
+	const paload = req.body
+
+ await AuthService.resetPassword(paload)
+		sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Password reset successfull",
+		data:null
+	});
+})
+
 export const AuthController = {
 	registerPatient,
 	loginUser,
 	getMe,
 	refreshToken,
 	googleLogin,
+	resetPassword,
+	forgotPassword,
+	verifyPatientEmail
 };

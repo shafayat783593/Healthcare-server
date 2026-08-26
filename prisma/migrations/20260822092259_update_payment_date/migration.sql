@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "payment" ALTER COLUMN "paidAt" SET DATA TYPE TEXT,
+ALTER COLUMN "refundAt" SET DATA TYPE TEXT;
