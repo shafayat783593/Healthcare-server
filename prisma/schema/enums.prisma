@@ -42,3 +42,9 @@ enum DoctorCertificationStatus {
     APPORVED
     REJECTED
 }
+
+enum ScheduleStatus {
+    DRAFT
+    PUBLISHED
+
+}
