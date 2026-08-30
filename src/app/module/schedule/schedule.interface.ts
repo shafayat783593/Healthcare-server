@@ -6,3 +6,13 @@ export interface IcreateSchedulePayload{
     mettingLink:string
 
 }
+
+
+export interface IupdateSchedulePayload{
+    startDate?:Date;
+    endDate?:Date;
+    mettingLink?:string
+
+}
+
+
