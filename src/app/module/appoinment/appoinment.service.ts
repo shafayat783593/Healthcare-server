@@ -13,6 +13,7 @@ import { IBookingAppointmentPayload } from "./appoinment.interface";
 import { addMinutes, isAfter, isBefore, isSameDay } from "date-fns";
 import { no } from "zod/locales";
 import { transporter } from "../../lib/nodmailer";
+import { generateInvoicePdf } from "../../utils/PDFDocument";
 
 const bookAppointment = async (
 	payload: IBookingAppointmentPayload,
@@ -331,7 +332,7 @@ const bookAppointmentCallback = async (query: Record<string, any>) => {
 				},
 				include: {
 					schedule: true,
-					patient:true
+					patient: true,
 				},
 			});
 			if (!appointement) {
@@ -383,11 +384,32 @@ const bookAppointmentCallback = async (query: Record<string, any>) => {
 					gatewayResponse: executedPaymentResult,
 				},
 			});
+
+			const pdfBuffer = await generateInvoicePdf({
+				patientName: appointement.patient.name, // patient model-এ name থাকলে
+				patientEmail: appointement.patient.email,
+				appointmentId: appointement.id,
+				trxId: executedPaymentResult.trxID,
+				amount: executedPaymentResult.amount || "1000",
+				date: new Date().toLocaleDateString(),
+				joiningTime: joiningTime.toISOString(),
+				serialNumber: serialNumber,
+			});
+			
+
 			await transporter.sendMail({
-				from:config.email_sender,
-				to:appointement.patient.email,
-				subject:"Your Appointment Ingoice - Ph Healtehcare System"
-			})
+				from: config.email_sender,
+				to: appointement.patient.email,
+				subject: "Your Appointment Invoice - PH Healthcare System",
+				html: `<p>Dear ${appointement.patient.name || "Patient"},</p><p>Your appointment payment was successful. Please find your invoice attached below.</p>`,
+				attachments: [
+					{
+						filename: `Invoice_${appointement.id}.pdf`,
+						content: pdfBuffer,
+						contentType: "application/pdf",
+					},
+				],
+			});
 
 			return {
 				redirectUrl: `${config.frontend_url}/dashboard/my-appointments?status=success`,
