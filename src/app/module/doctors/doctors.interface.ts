@@ -1,6 +1,21 @@
 import { DoctorCertificationStatus } from "../../../generated/prisma/enums";
 
-
+export interface IApplyAsDoctorPayload {
+    user: {
+        name: string;
+        email: string;
+    };
+    doctor: {
+        address?: string;
+        specialization: string;
+        licenseNumber: string;
+        qualifications: string;
+        experienceYears: number;
+        bio?: string;
+        consultationFee?: number;
+        contactNumber?: string;
+    };
+}
 
 
 export interface IVerifyDoctorEmailPayload {
@@ -8,9 +23,18 @@ export interface IVerifyDoctorEmailPayload {
     otp: string;
 }
 
-export interface IApprovedDoctorPayload{
-    doctorId:string;
-    verificationStatus:DoctorCertificationStatus;
-    rejectionReason:string;
 
+
+
+export interface IApproveDoctorPayload {
+    doctorId: string;
+    verificationStatus: DoctorCertificationStatus;
+    rejectionReason: string;
+}
+
+export interface IUpdateDoctorProfilePayload {
+    address?: string;
+    bio?: string;
+    consultationFee?: number;
+    contactNumber?: string;
 }

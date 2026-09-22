@@ -33,7 +33,6 @@ const patientVerifyZodSchema = z.object({
 		.regex(/[a-z]/, "Password must contain atleast 1 LowerCase letter")
 		.regex(/[0-9]/, "Password must contain atleast 1 Number")
 		.regex(/[^A-Za-z0-9]/, "Password must contain atleast 1 Special Character"),
-
 })
 
 const resetPasswordZodSchema = z.object({

@@ -1,3 +1,4 @@
+
 import cron from "node-cron";
 import { prisma } from "./prisma";
 import {
@@ -7,7 +8,7 @@ import {
 
 export const deleteUnverifiedAndRejectedDoctors = async () => {
 	// Every 10 minutes
-	cron.schedule("*/10 * * * *", async () => {
+	cron.schedule("0 0 * * *", async () => {
 		try {
 			// ============================================
 			// 1. Unverified email doctor => delete after 1 hour
@@ -26,8 +27,10 @@ export const deleteUnverifiedAndRejectedDoctors = async () => {
 							lt: oneHourAgo,
 						},
 						doctor: {
-							verificationStatus:
-								DoctorCertificationStatus.PENDING,
+							is: {
+								verificationStatus:
+									DoctorCertificationStatus.PENDING,
+							},
 						},
 					},
 				});
@@ -52,13 +55,13 @@ export const deleteUnverifiedAndRejectedDoctors = async () => {
 				await prisma.user.deleteMany({
 					where: {
 						role: Role.DOCTOR,
-
 						doctor: {
-							verificationStatus:
-								DoctorCertificationStatus.REJECTED,
-
-							rejectedAt: {
-								lt: oneMonthAgo,
+							is: {
+								verificationStatus:
+									DoctorCertificationStatus.REJECTED,
+								rejectedAt: {
+									lt: oneMonthAgo,
+								},
 							},
 						},
 					},
@@ -81,3 +84,4 @@ export const deleteUnverifiedAndRejectedDoctors = async () => {
 		"Doctor cleanup cron scheduled (every 10 minutes)",
 	);
 };
+
